@@ -22,7 +22,7 @@ export class AuthService {
     {
         const username = await this.userRepository.signIn(authCredentialsDto);
         console.log("Username: "+username);
-        if(username=="no")
+        if(!username)
         {
             throw new UnauthorizedException('Invalid credentials');
         }

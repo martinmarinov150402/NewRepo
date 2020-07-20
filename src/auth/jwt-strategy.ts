@@ -14,7 +14,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
         @InjectRepository(UserRepository)
         private userRepository:UserRepository,
-        //private configService:ConfigService,
     )
     {
         super({

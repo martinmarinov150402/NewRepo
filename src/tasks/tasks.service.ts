@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { DeleteResult, QueryBuilder } from 'typeorm';
 import { User } from 'src/auth/user.entity';
+import {GetTasksFilterDto} from "../auth/dto/get-tasks-filter.dto";
 
 @Injectable()
 export class TasksService {
@@ -31,17 +32,16 @@ export class TasksService {
     {
         this.taskRepository.deleteTask(id,user);
     }
-    async patchTask(id:number,user:User,item:string,val:string):Promise<Task>
+    async patchTask(id: number,val: TaskStatus, user: User): Promise<void>
     {
-        const task = await this.getTaskByID(id,user);
-        task[item]=val;
-        await task.save();
-        return task;
+        //const task = await this.getTaskByID(id, user);
+        const { affected } = await this.taskRepository.update({ userId: user.id, id }, { status: val });
+        if (!affected)
+            throw new NotFoundException('Task was not found!');
     }
-    async getTasks(user:User):Promise<Task[]>
+    async getTasks(getTasksFilterDto: GetTasksFilterDto, user:User):Promise<Task[]>
     {
-        const res = await this.taskRepository.getTasks(user);
-        return res;
+        return await this.taskRepository.getTasks(getTasksFilterDto, user);
     }
     /*private tasks: Task[] = [];
     getAllTasks(): Task[] {
