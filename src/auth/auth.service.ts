@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Body } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDTO } from './dto/auth-credentials.dto';
@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserRoles } from './enums/user-roles.enum';
 import { User } from './user.entity';
+import { ChangeRoleDTO } from './dto/change-role.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,13 +31,15 @@ export class AuthService {
         const accessToken = this.jwtService.sign(payload);
         return {accessToken};
     }
-    async grant(userid:number, role:UserRoles):Promise<User>{
+    async grant(data:ChangeRoleDTO):Promise<User>{
+        const {userid,role} = data;
         let user:User = await this.userRepository.findUserById(userid);
         user.role=role;
         return await user.save();
         
     }
-    async revoke(userid:number, role:UserRoles):Promise<User>{
+    async revoke(data:ChangeRoleDTO):Promise<User>{
+        const {userid,role} = data;
         let user:User = await this.userRepository.findUserById(userid);
         user.role=role;
         return await user.save();

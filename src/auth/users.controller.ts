@@ -4,48 +4,21 @@ import { UserRoles } from './enums/user-roles.enum';
 import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { ChangeRoleDTO } from './dto/change-role.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard())
 export class UsersController {
     constructor(private authService:AuthService){};
     @Post('/grant')
-    grant(@Body("userid") userid:number, @Body("role") role:string)
+    grant(@Body() data:ChangeRoleDTO)
     {
-        let role1;
-        role=role.toUpperCase();
-        if(role==="USER")
-        {
-            role1=UserRoles.User;
-        }
-        else if(role==="ADMIN")
-        {
-            role1=UserRoles.Admin;
-        }
-        else
-        {
-            throw new BadRequestException('Invalid role');
-        }
-        return this.authService.grant(userid,role1);
+        return this.authService.grant(data);
     }
     @Post('/revoke')
-    revoke(@Body("userid") userid:number, @Body("role") role:string)
+    revoke(@Body() data:ChangeRoleDTO)
     {
-        let role1;
-        role=role.toUpperCase();
-        if(role==="USER")
-        {
-            role1=UserRoles.User;
-        }
-        else if(role==="ADMIN")
-        {
-            role1=UserRoles.Admin;
-        }
-        else
-        {
-            throw new BadRequestException('Invalid role');
-        }
-        return this.authService.revoke(userid,role1);
+        return this.authService.revoke(data);
     }
     @Post('/myrole')
     myrole(@GetUser() user:User)

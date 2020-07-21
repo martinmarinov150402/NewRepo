@@ -5,9 +5,6 @@ import {configObject} from './config.object';
 import {ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  //console.log(typeOrmConfig.database);
-  /*console.log(process.env);
-  console.log(process.env.DB_NAME);*/
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   if(process.env.NODE_ENV === 'development'){
