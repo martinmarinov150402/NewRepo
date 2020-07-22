@@ -60,4 +60,11 @@ export class UserRepository extends Repository<User>
 
         return undefined;
     }
+    async countAdmins()
+    {
+        const query = this.createQueryBuilder('user');
+        query.andWhere('(user.role = :role )', { role:UserRoles.Admin});
+        let admins = await query.getCount();
+        return admins;
+    }
 }

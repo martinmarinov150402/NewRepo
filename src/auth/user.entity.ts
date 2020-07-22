@@ -17,8 +17,8 @@ export class User extends BaseEntity{
     @Column()
     salt:string;
 
-    @Column()
-    role:string;
+    @Column({nullable:true})
+    role:UserRoles;
 
     @OneToMany(type=>Task, task=>task.user, {eager:true})
     tasks:Task[];

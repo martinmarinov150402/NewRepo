@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Body } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Body, BadRequestException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDTO } from './dto/auth-credentials.dto';
@@ -7,6 +7,8 @@ import { JwtPayload } from './jwt-payload.interface';
 import { UserRoles } from './enums/user-roles.enum';
 import { User } from './user.entity';
 import { ChangeRoleDTO } from './dto/change-role.dto';
+import { AuthorizationService } from './authorization.service';
+import { Operations } from './enums/operations.enum';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,7 @@ export class AuthService {
         @InjectRepository(UserRepository)
         private userRepository:UserRepository,
         private jwtService:JwtService,
+        private authorizationService:AuthorizationService,
     ){}
     async signUp(authCredentialsDto:AuthCredentialsDTO):Promise<void>
     {
@@ -31,18 +34,43 @@ export class AuthService {
         const accessToken = this.jwtService.sign(payload);
         return {accessToken};
     }
-    async grant(data:ChangeRoleDTO):Promise<User>{
-        const {userid,role} = data;
-        let user:User = await this.userRepository.findUserById(userid);
-        user.role=role;
-        return await user.save();
+    async grant(sender:User, data:ChangeRoleDTO):Promise<User>{
+        if(this.authorizationService.isAuthorized(sender,Operations.Grant))
+        {
+            const {userid,role} = data;
+            let user:User = await this.userRepository.findUserById(userid);
+            let admins= await this.userRepository.countAdmins();
+            if(userid===sender.id)
+            {
+                throw new BadRequestException("You can't grant yourself");
+            }
+            user.role=role;
+            return await user.save(); 
+        }
+        else
+        {
+            throw new UnauthorizedException("You don't have permission to do this");
+        }
         
     }
-    async revoke(data:ChangeRoleDTO):Promise<User>{
-        const {userid,role} = data;
-        let user:User = await this.userRepository.findUserById(userid);
-        user.role=role;
-        return await user.save();
+    async revoke(sender:User, data:ChangeRoleDTO):Promise<User>{
+        if(this.authorizationService.isAuthorized(sender,Operations.Revoke))
+        {
+            const {userid,role} = data;
+            let user:User = await this.userRepository.findUserById(userid);
+            let admins= await this.userRepository.countAdmins();
+            if(admins==1)
+            {
+                throw new BadRequestException("You can't revoke yourself because you are the last admin");
+            }
+            user.role=role;
+            return await user.save(); 
+        }
+        else
+        {
+            throw new UnauthorizedException("You don't have permission to do this");
+        }
+        
         
     }
     async getRole(user:User):Promise<String>

@@ -11,14 +11,14 @@ import { ChangeRoleDTO } from './dto/change-role.dto';
 export class UsersController {
     constructor(private authService:AuthService){};
     @Post('/grant')
-    grant(@Body() data:ChangeRoleDTO)
+    grant(@GetUser() sender:User, @Body() data:ChangeRoleDTO)
     {
-        return this.authService.grant(data);
+        return this.authService.grant(sender,data);
     }
     @Post('/revoke')
-    revoke(@Body() data:ChangeRoleDTO)
+    revoke(@GetUser() sender:User, @Body() data:ChangeRoleDTO)
     {
-        return this.authService.revoke(data);
+        return this.authService.revoke(sender,data);
     }
     @Post('/myrole')
     myrole(@GetUser() user:User)

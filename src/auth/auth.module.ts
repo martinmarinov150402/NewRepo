@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt-strategy';
 import {configObject} from '../config.object'
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { UsersController } from './users.controller';
+import { AuthorizationService } from './authorization.service';
 
 const configService = new ConfigService();
 @Module({
@@ -26,7 +27,8 @@ const configService = new ConfigService();
   controllers: [AuthController, UsersController],
   providers: [
     AuthService,
-    JwtStrategy
+    JwtStrategy,
+    AuthorizationService,
   ],
   exports: [
     JwtStrategy,

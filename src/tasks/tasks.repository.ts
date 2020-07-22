@@ -15,6 +15,12 @@ export class TaskRepository extends Repository<Task> {
         query.andWhere("task.id = :taskId",{taskId:id});
         return await query.getOne();
     }
+    async findTaskByIdA(id:Number,user:User):Promise<Task>
+    {
+        const query=this.createQueryBuilder('task');
+        query.andWhere("task.id = :taskId",{taskId:id});
+        return await query.getOne();
+    }
     async getTasks(getTasksFilterDto: GetTasksFilterDto, user:User): Promise<Task[]>
     {
         const { search, status } = getTasksFilterDto;
@@ -27,6 +33,19 @@ export class TaskRepository extends Repository<Task> {
             query.andWhere('task.status = :status', { status });
 
         query.andWhere('task.userId = :userId',{userId:user.id});
+        return  await query.getMany();
+    }
+    async getTasksA(getTasksFilterDto: GetTasksFilterDto, user:User): Promise<Task[]>
+    {
+        const { search, status } = getTasksFilterDto;
+        const query = this.createQueryBuilder('task');
+
+        if (search)
+            query.andWhere('(task.title LIKE :search OR task.description LIKE :search)', { search: `%${search}%` });
+
+        if (status)
+            query.andWhere('task.status = :status', { status });
+
         return  await query.getMany();
     }
     async createTask(createTaskDto:CreateTaskDTO,user:User){
@@ -44,6 +63,14 @@ export class TaskRepository extends Repository<Task> {
     async deleteTask(id:number,user:User):Promise<void>
     {
         const task=await this.delete({id,userId:user.id});
+        if(task.affected === 0)
+        {
+            throw new NotFoundException('Task not found');
+        }
+    }
+    async deleteTaskA(id:number,user:User):Promise<void>
+    {
+        const task=await this.delete({id});
         if(task.affected === 0)
         {
             throw new NotFoundException('Task not found');
