@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import {configObject} from './config.object';
 import {ConfigService } from '@nestjs/config';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());

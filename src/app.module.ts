@@ -27,8 +27,8 @@ FillObject();*/
     }),
     FillModule,
     TypeOrmModule.forRootAsync({useClass:TypeOrmConfigService}),
-    TasksModule,
     AuthModule,
+    TasksModule,
     
   ],
   controllers: [],

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Body, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Body, BadRequestException, Inject } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDTO } from './dto/auth-credentials.dto';
@@ -17,13 +17,26 @@ export class AuthService {
         private userRepository:UserRepository,
         private jwtService:JwtService,
         private authorizationService:AuthorizationService,
-    ){}
+    ){this.fillIds()};
+    public adminIds:number[]=[100,101];
+    async fillIds()
+    {
+        this.adminIds=[];
+        let admins= await this.userRepository.find({role:UserRoles.Admin});
+        for(let i=0;i<admins.length;i++)
+        {
+            this.adminIds.push(admins[i].id);
+        }
+        console.log(this.adminIds);//Here is filled with values
+    }
+
     async signUp(authCredentialsDto:AuthCredentialsDTO):Promise<void>
     {
         return this.userRepository.signUp(authCredentialsDto);
     }
     async signIn(authCredentialsDto:AuthCredentialsDTO):Promise<{accessToken:string}>
     {
+        console.log(this.adminIds);
         const username = await this.userRepository.signIn(authCredentialsDto);
         console.log("Username: "+username);
         if(!username)
@@ -45,6 +58,10 @@ export class AuthService {
                 throw new BadRequestException("You can't grant yourself");
             }
             user.role=role;
+            if(role===UserRoles.Admin)
+            {
+                this.adminIds.push(user.id);
+            }
             return await user.save(); 
         }
         else
@@ -62,6 +79,11 @@ export class AuthService {
             if(admins==1)
             {
                 throw new BadRequestException("You can't revoke yourself because you are the last admin");
+            }
+            if(user.role===UserRoles.Admin&&role===UserRoles.User)
+            {
+                const idx = this.adminIds.indexOf(user.id);
+                this.adminIds.splice(idx,1);
             }
             user.role=role;
             return await user.save(); 

@@ -10,12 +10,14 @@ import { User } from 'src/auth/user.entity';
 import {GetTasksFilterDto} from "../auth/dto/get-tasks-filter.dto";
 import { AuthorizationService } from 'src/auth/authorization.service';
 import { Operations } from 'src/auth/enums/operations.enum';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TasksService {
     constructor(
         @InjectRepository(TaskRepository)
         private taskRepository:TaskRepository,
+        private authSerivce:AuthService,
         private authorizationService:AuthorizationService,
         ){}
     async getTaskByID(id:number,user:User):Promise<Task>
@@ -23,7 +25,7 @@ export class TasksService {
         let found;
         if(this.authorizationService.isAuthorized(user,Operations.AccessAllTasks))
         {
-            found = await this.taskRepository.findTaskByIdA(id,user);
+            found = await this.taskRepository.findTaskByIdA(id,user,this.authSerivce.adminIds);
         }
         else
         {
@@ -43,7 +45,7 @@ export class TasksService {
     {
         if(this.authorizationService.isAuthorized(user,Operations.AccessAllTasks))
         {
-        await this.taskRepository.deleteTaskA(id,user);
+        await this.taskRepository.deleteTaskA(id,user,this.authSerivce.adminIds);
         }
         else
         {
@@ -71,7 +73,9 @@ export class TasksService {
     {
         if(this.authorizationService.isAuthorized(user,Operations.AccessAllTasks))
         {
-            return await this.taskRepository.getTasksA(getTasksFilterDto, user);
+            console.log("GetTasks");
+            console.log(this.authSerivce.adminIds);
+            return await this.taskRepository.getTasksA(getTasksFilterDto, user,this.authSerivce.adminIds);
         }
         else
         {
