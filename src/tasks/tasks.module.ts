@@ -11,10 +11,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserRepository } from 'src/auth/user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { configObject } from 'src/config.object';
+import { OrganisationRepository } from 'src/organisations/organisations.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TaskRepository,UserRepository]),
+    TypeOrmModule.forFeature([TaskRepository,UserRepository,OrganisationRepository]),
     AuthModule,
     JwtModule.register({
       secret: configObject.jwt_secret,
@@ -24,6 +25,6 @@ import { configObject } from 'src/config.object';
     })
   ],
   controllers: [TasksController],
-  providers: [TasksService,AuthorizationService,AuthService],
+  providers: [TasksService,AuthorizationService],
 })
 export class TasksModule {}

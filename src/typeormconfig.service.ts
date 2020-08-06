@@ -4,6 +4,7 @@ import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { Task } from './tasks/task.entity'
 import {configObject} from './config.object'
 import { User } from './auth/user.entity'
+import { Organisation } from './organisations/organisation.entity'
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -21,7 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       //url: this.configService.get<string>('TYPEORM_URL'),
       synchronize:true,
       //synchronize: configObject.db_sync,
-      entities:[Task,User],
+      entities:[Task,User,Organisation],
     }
   }
 }

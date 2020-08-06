@@ -10,13 +10,15 @@ import {configObject} from '../config.object'
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { UsersController } from './users.controller';
 import { AuthorizationService } from './authorization.service';
+import { OrganisationRepository } from 'src/organisations/organisations.repository';
+import { TaskRepository } from 'src/tasks/tasks.repository';
 
 const configService = new ConfigService();
 @Module({
   imports: [
     //ConfigModule.forFeature({})
     PassportModule.register({defaultStrategy: 'jwt'}),
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([TaskRepository,UserRepository,OrganisationRepository]),
     JwtModule.register({
       secret: configObject.jwt_secret,
       signOptions: {
@@ -33,6 +35,7 @@ const configService = new ConfigService();
   exports: [
     JwtStrategy,
     PassportModule,
+    AuthService,
   ],
 })
 export class AuthModule {

@@ -18,6 +18,7 @@ export class UserRepository extends Repository<User>
         user.password=await this.hashPassword(password,salt);
         user.role=UserRoles.User;
         user.salt=salt;
+        //user.organisations=[];
         try
         {
            await user.save(); 
