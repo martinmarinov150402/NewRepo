@@ -14,11 +14,9 @@ export class Organisation extends BaseEntity
     @Column()
     type:OrganisationTypes;
 
-    @ManyToMany(type => User)
-    @JoinTable()
-    members:User[];
+    @Column({default:""})
+    members:string;
 
-    @ManyToMany(type => User)
-    @JoinTable()
-    managers:User[];
+    @Column({default:""})
+    managers:string;
 }

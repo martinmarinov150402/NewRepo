@@ -26,8 +26,7 @@ export class User extends BaseEntity{
     @OneToMany(type=>Task, task=>task.user, {eager:true})
     tasks:Task[];
 
-    @ManyToMany(type=>Organisation,{cascade:true})
-    @JoinTable()
-    organisations:Organisation[];
+    @Column({default:""})
+    organisations:string;
 
 }
