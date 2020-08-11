@@ -9,6 +9,16 @@ import { ConflictException, InternalServerErrorException } from "@nestjs/common"
 @EntityRepository(User)
 export class UserRepository extends Repository<User>
 {
+    async removeMemberFromOrg(user:User,orgid:number,userid:number)
+    {
+        let us=await this.findOne({id:userid});
+        let str=";"+ "a"+ orgid.toString()+"a";
+        if(str.length>us.organisations.length)
+        {
+            str="a"+ orgid.toString()+"a";
+        }
+        us.organisations=us.organisations.replace(str,"");
+    }
     async signUp(authCredentialsDto:AuthCredentialsDTO):Promise<void>
     {
         const { username,password } = authCredentialsDto;

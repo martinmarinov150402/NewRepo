@@ -15,11 +15,11 @@ export class OrganisationRepository extends Repository<Organisation>
         newOrg.name=name;
         newOrg.type=type;
         newOrg.managers="";
-        newOrg.managers += sender.id.toString();
+        newOrg.managers += "a"+ sender.id.toString()+"a";
         console.log("TUKA");
         await newOrg.save();
-        if(sender.organisations==="") sender.organisations+=newOrg.id.toString();
-        else sender.organisations+= ";" + newOrg.id.toString();
+        if(sender.organisations==="") sender.organisations+="a"+newOrg.id.toString()+"a";
+        else sender.organisations+= ";" + "a"+ newOrg.id.toString()+"a";
         await sender.save();
         return newOrg;
     }
@@ -30,18 +30,18 @@ export class OrganisationRepository extends Repository<Organisation>
         {
             throw new BadRequestException("Organisation not found");
         }
-        if(user.organisations === "") user.organisations += orgid.toString();
-        else user.organisations += ";" + orgid.toString();
+        if(user.organisations === "") user.organisations += "a"+ orgid.toString()+"a";
+        else user.organisations += ";" + "a"+ orgid.toString()+"a";
         await user.save();
         if(position === "member")
         {
-            if(organisation.members === "") organisation.members += user.id.toString();
-            else organisation.members += ";" + user.id.toString();
+            if(organisation.members === "") organisation.members += "a"+ user.id.toString()+"a";
+            else organisation.members += ";" + "a"+ user.id.toString()+"a";
         }
         else if(position === "manager")
         {
-            if(organisation.managers === "") organisation.managers += user.id.toString();
-            else organisation.managers += ";" + user.id.toString();
+            if(organisation.managers === "") organisation.managers += "a"+ user.id.toString()+"a";
+            else organisation.managers += ";" + "a"+ user.id.toString()+"a";
         }
         else
         {
@@ -68,17 +68,17 @@ export class OrganisationRepository extends Repository<Organisation>
         else
         {
             
-            let str=";"+userid.toString();
+            let str=";"+"a"+ userid.toString()+"a";
             let strdel=str;
             if(org.members.length<strdel.length)
             {
-                strdel=userid.toString();
+                strdel="a"+ userid.toString()+"a";
             }
             let idx = org.members.indexOf(strdel);
             org.members=org.members.replace(strdel,"");
             if(org.managers.length===0)
             {
-                org.managers+=userid.toString();
+                org.managers+="a"+ userid.toString()+"a";
             }
             else
             {
@@ -90,38 +90,39 @@ export class OrganisationRepository extends Repository<Organisation>
     async members(user:User,orgid:number)
     {
         let org = await this.findOne({id:orgid});
-        if(!user.organisations.includes(orgid.toString()))
+        if(!user.organisations.includes("a"+ orgid.toString()+"a"))
         {
-            throw new BadRequestException("This user is not a member in that organisation");
+            throw new BadRequestException("You are not a member in that organisation");
         }
         else
         {
-            return "Member IDS: "+org.members+"\n Manager IDS: "+org.managers;
+            return "Member IDS: "+org.members.replace("a","")+"\n Manager IDS: "+org.managers.replace("a","");
         }
     }
-    /*async kickMember(user:User,orgid:number,userid:number)
+    async kickMember(user:User,orgid:number,userid:number)
     {
         let org = await this.findOne({id:orgid});
-        if(!org.managers.includes(user.id.toString()))
+        if(!org.managers.includes("a"+ user.id.toString()+"a"))
         {
-            throw new BadRequestException("You aren't a manager of this organisation");
+            return "NOTMAN";
         }
         else
         {
-            if(!org.members.includes(userid.toString()))
+            if(!org.members.includes("a"+userid.toString()+"a"))
             {
-                throw new BadRequestException("The user you want to kick isn't a member of that organisation");
+                return "IOKMEMB";
             }
             else
             {
-                let str=";"+userid.toString();
+                let str=";"+ "a"+ userid.toString()+"a";
                 if(str.length>org.members.length)
                 {
-                    str=userid.toString();
+                    str="a"+ userid.toString()+"a";
                 }
                 org.members=org.members.replace(str,"");
                 await org.save();
+                return "OK";
             }
         }
-    }*/
+    }
 }

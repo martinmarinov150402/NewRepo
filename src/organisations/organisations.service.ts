@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateOrgDTO } from './dto/createOrg.dto';
 import { OrganisationRepository } from './organisations.repository';
 import { User } from 'src/auth/user.entity';
@@ -6,7 +6,7 @@ import { UserRepository } from 'src/auth/user.repository';
 
 @Injectable()
 export class OrganisationsService {
-    constructor(private organisationRepository:OrganisationRepository){}
+    constructor(private organisationRepository:OrganisationRepository,private userRepository:UserRepository){}
 
     isUserInOrg(user:User,id:number)
     {
@@ -43,6 +43,20 @@ export class OrganisationsService {
     }
     async kickMember(user:User,orgid:number,userid:number)
     {
-        //return await this.organisationRepository.kickMember(user,orgid,userid);
+        let result = await this.organisationRepository.kickMember(user,orgid,userid);
+        if(result==="NOTMAN")
+        {
+            throw new BadRequestException("You are not manager of this organisation");
+        }
+        else if(result==="IOKMEMB")
+        {
+            throw new BadRequestException("This user is not a member of this organisation or is a manager");
+        }
+        else
+        {
+          await this.userRepository.removeMemberFromOrg(user,orgid,userid);
+        }
+        
+        
     }
 }

@@ -1,8 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, Unique, OneToMany, JoinTable, ManyToMany } from "typeorm";
 import { Task } from "src/tasks/task.entity";
 import { UserRoles } from "./enums/user-roles.enum";
-import { Organisation } from "src/organisations/organisation.entity";
-import { OrganisationsService } from "src/organisations/organisations.service";
 
 @Entity()
 @Unique(['username'])
